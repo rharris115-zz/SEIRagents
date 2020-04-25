@@ -11,7 +11,11 @@
 
 <script type="module">
 
-    var scheduler = jssim.Scheduler();
+    import {Population, index_as_id, unit_square_distribution} from "./src/Population.js";
+
+    let scheduler = jssim.Scheduler();
+
+    let p = Population.of(1000).with(index_as_id).with(unit_square_distribution)
 
     console.log('blah')
 
