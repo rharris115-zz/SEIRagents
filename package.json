@@ -1,0 +1,11 @@
+{
+  "name": "SEIRagents",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rharris115/SEIRagents.git"
+  },
+  "dependencies": {
+    "backspaces/agentscript": "latest"
+  }
+}
