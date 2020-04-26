@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>SEIR</title>
-    <script src="./node_modules/js-simulator/src/jssim.js" type="text/javascript"></script>
+    <script src="./node_modules/js-simulator/src/jssim.js"></script>
+    <script src="./node_modules/kd-tree-javascript/kdTree.js"></script>
 </head>
 <body>
 
@@ -11,11 +12,48 @@
 
 <script type="module">
 
-    import {Population, index_as_id, unit_square_distribution} from "./src/Population.js";
+    import {Population, unit_square_distribution} from "./src/Population.js"
 
-    let scheduler = jssim.Scheduler();
+    let scheduler = jssim.Scheduler()
 
-    let p = Population.of(1000).with(index_as_id).with(unit_square_distribution)
+    let n = 1000
+    let exponent = -2
+    let maxDistance = 0.25
+
+    let pop = Population.of(n).with(unit_square_distribution)
+
+    let tree = new kdTree(pop.individuals,
+        (i1, i2) => Math.sqrt((i1.x - i2.x) ** 2 + (i1.y - i2.y) ** 2),
+        ['x', 'y'])
+
+    let individual_probs = pop.individuals.map((individual) => {
+        let ps = tree.nearest(individual, n, maxDistance).map(link => {
+            let [neighbor, distance] = link
+            if (distance === 0) {
+                return {}
+            } else {
+                return {neighbor: neighbor.id, p: distance ** exponent}
+            }
+        })
+        return ps.reduce((a, x) => ({...a, [x.neighbor]: x.p}), {})
+    })
+
+    // return ps.reduce((a, b) => a + b, 0)
+
+
+    let total_prob = individual_probs.reduce((a, b) => a + b, 0)
+
+    let probs = individual_probs.map(i_prob => i_prob / total_prob)
+
+    pop.individuals.forEach((individual, id) => {
+        let links = tree.nearest(individual, n, 0.5)
+        links.forEach((link) => {
+            let [n_id, distance] = link
+
+        })
+        tree.remove(individual)
+    })
+
 
     console.log('blah')
 
