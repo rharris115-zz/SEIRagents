@@ -2,6 +2,7 @@ export class GravityContactSampler {
     constructor(population, maxDistance, exponent) {
 
         this.population = population
+        this.chance = new Chance()
 
         let tree = new kdTree(
             population.individuals,
@@ -19,31 +20,32 @@ export class GravityContactSampler {
                     let [neighbor, distance] = link
                     return {id: neighbor.id, gravity: distance ** exponent}
                 })
-                .reduce((a, x) => ({...a, [x.id]: x.gravity}), {})
         })
 
+        let neighborIds = contact_gravity
+            .map(neighbors => Array.from(neighbors, neighbor => neighbor.id))
 
-        let individual_total_gravity = contact_gravity.map(gs => Object.values(gs).reduce((a, b) => a + b, 0))
+        this.neighborIdsById = population.individuals
+            .map((individual, index) => ({id: individual.id, neighborIds: neighborIds[index]}))
+            .reduce((a, b) => ({...a, [b.id]: b.neighborIds}), {})
 
-        let total_gravity = individual_total_gravity.reduce((a, b) => a + b, 0)
+        let neighborGravities = contact_gravity
+            .map(neighbors => Array.from(neighbors, neighbor => neighbor.gravity))
 
-        this.individual_probs = individual_total_gravity.map(itg => itg / total_gravity)
+        this.neighborGravitiesById = population.individuals
+            .map((individual, index) => ({id: individual.id, neighborGravities: neighborGravities[index]}))
+            .reduce((a, b) => ({...a, [b.id]: b.neighborGravities}), {})
 
-        this.individual_contact_probs = contact_gravity
-            .map((gs, index) => {
-                return Object.entries(gs)
-                    .map((entry) => {
-                        let [id, g] = entry
-                        return {id: id, p: g / individual_total_gravity[index]}
-                    })
-                    .reduce((a, x) => ({...a, [x.id]: x.p}), {})
-            })
-
-        this.chance = new Chance()
+        //Sum up the total gravity for each individual.
+        this.individual_total_gravity = neighborGravities
+            .map(neighborGravity => neighborGravity.reduce((a, b) => a + b, 0))
     }
 
-    sample() {
-        let individual = this.chance.weighted(this.population.individuals, this.individual_probs)
-        return individual
+    sampleIndividual() {
+        return this.chance.weighted(this.population.individuals, this.individual_total_gravity)
+    }
+
+    sampleNeighbor(id) {
+        return this.chance.weighted(this.neighborIdsById[id], this.neighborGravitiesById[id])
     }
 }

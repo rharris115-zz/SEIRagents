@@ -22,12 +22,16 @@
     let exponent = -2
     let maxDistance = 0.25
 
-    let pop = Population.of(n).with(unit_square_distribution)
+    let pop = Population.of(n, (index) => "agent" + index.toString()).with(unit_square_distribution)
 
     let gravity = new GravityContactSampler(pop, maxDistance, exponent)
 
+    while (true) {
+        let ind = gravity.sampleIndividual()
+        let neighbor = gravity.sampleNeighbor(ind.id)
+        console.log(ind, neighbor)
+    }
 
-    console.log(gravity.sample())
 
 </script>
 
