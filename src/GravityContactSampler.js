@@ -46,6 +46,7 @@ export class GravityContactSampler {
     }
 
     sampleNeighbor(id) {
-        return this.chance.weighted(this.neighborIdsById[id], this.neighborGravitiesById[id])
+        let neighborId = this.chance.weighted(this.neighborIdsById[id], this.neighborGravitiesById[id])
+        return this.population[neighborId]
     }
 }
