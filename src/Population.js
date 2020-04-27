@@ -7,9 +7,8 @@ const State = Object.freeze({
 })
 
 
-export let unit_square_distribution = () => {
-    return {x: Math.random(), y: Math.random()};
-}
+export let unit_square_distribution = () => ({x: Math.random(), y: Math.random()})
+
 
 export class Population {
 
@@ -22,11 +21,10 @@ export class Population {
         })
     }
 
-    static of(count, idfn = (index) => index) {
-        return new Population(Array.from({length: count}, (individual, index) => {
-            let id = idfn(index)
-            return {state: State.Susceptible, id: id}
-        }));
+    static of(count, idfn = index => index) {
+        return new Population(Array.from({length: count},
+            (individual, index) => ({state: State.Susceptible, id: idfn(index)})
+        ));
     }
 
     with(fn) {
