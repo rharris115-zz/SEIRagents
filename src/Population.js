@@ -31,7 +31,7 @@ export class Population {
 
     with(fn) {
         this.asArray.forEach((individual, index) => {
-            Object.assign(individual, fn(individual, index));
+            Object.assign(individual, fn(individual, index)) //Individuals are mutable. References to them are not.
         })
         return this;
     }
