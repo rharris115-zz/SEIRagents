@@ -17,7 +17,12 @@ export class Population {
         this.asArray = Object.freeze(Array.from(individuals)) //Shallow freeze ... individuals are still mutable.
         this.asArray.forEach((individual) => {
             if (individual.hasOwnProperty('id')) {
-                this[individual.id] = individual
+                let id = individual.id
+                if (id === "asArray") {
+                    throw "\"asArray\" is a reserved attribute and cannot be used as an individual id."
+                } else {
+                    this[id] = individual
+                }
             }
         })
         Object.freeze(this) //Shallow freeze ... individuals are still mutable.

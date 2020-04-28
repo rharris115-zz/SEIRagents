@@ -30,7 +30,7 @@
         .withExponent(exponent)
         .build()
 
-    while (true) {
+    for (let i = 0; i < 100; i++) {
         let ind = gravity.sampleIndividual()
         let neighbor = gravity.sampleNeighbor(ind.id)
         ind.state = State.Infected
