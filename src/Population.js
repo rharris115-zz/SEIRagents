@@ -14,13 +14,13 @@ export class Population {
 
 
     constructor(individuals) {
-        this.asArray = Object.freeze(Array.from(individuals))
+        this.asArray = Object.freeze(Array.from(individuals)) //Shallow freeze ... individuals are still mutable.
         this.asArray.forEach((individual) => {
             if (individual.hasOwnProperty('id')) {
                 this[individual.id] = individual
             }
         })
-        Object.freeze(this)
+        Object.freeze(this) //Shallow freeze ... individuals are still mutable.
     }
 
     static of(count, idfn = index => index) {
