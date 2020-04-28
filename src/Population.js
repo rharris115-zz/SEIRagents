@@ -1,4 +1,4 @@
-const State = Object.freeze({
+export const State = Object.freeze({
     Susceptible: 0,
     Exposed: 1,
     Infected: 2,
@@ -12,13 +12,15 @@ export let unit_square_distribution = () => ({x: Math.random(), y: Math.random()
 
 export class Population {
 
+
     constructor(individuals) {
-        this.individuals = Array.from(individuals)
-        this.individuals.forEach((individual) => {
+        this.asArray = Object.freeze(Array.from(individuals))
+        this.asArray.forEach((individual) => {
             if (individual.hasOwnProperty('id')) {
                 this[individual.id] = individual
             }
         })
+        Object.freeze(this)
     }
 
     static of(count, idfn = index => index) {
@@ -28,8 +30,8 @@ export class Population {
     }
 
     with(fn) {
-        this.individuals.forEach((individual, id) => {
-            Object.assign(individual, fn(individual, id));
+        this.asArray.forEach((individual, index) => {
+            Object.assign(individual, fn(individual, index));
         })
         return this;
     }

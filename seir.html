@@ -13,7 +13,7 @@
 
 <script type="module">
 
-    import {Population, unit_square_distribution} from "./src/Population.js"
+    import {Population, unit_square_distribution, State} from "./src/Population.js"
     import {GravityContactSampler} from "./src/GravityContactSampler.js";
 
     let scheduler = jssim.Scheduler()
@@ -22,13 +22,19 @@
     let exponent = -2
     let maxDistance = 0.25
 
-    let pop = Population.of(n, (index) => "agent" + index.toString()).with(unit_square_distribution)
+    let pop = Population.of(n, index => "agent" + index.toString()).with(unit_square_distribution)
 
-    let gravity = new GravityContactSampler(pop, maxDistance, exponent)
+
+    let gravity = GravityContactSampler.builder(pop)
+        .withMaxDistance(maxDistance)
+        .withExponent(exponent)
+        .build()
 
     while (true) {
         let ind = gravity.sampleIndividual()
         let neighbor = gravity.sampleNeighbor(ind.id)
+        ind.state = State.Infected
+        neighbor.state = State.Exposed
         console.log(ind, neighbor)
     }
 
