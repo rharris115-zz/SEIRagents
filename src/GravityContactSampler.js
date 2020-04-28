@@ -1,25 +1,16 @@
 function deepFreeze(object) {
-
-    // Retrieve the property names defined on object
-    var propNames = Object.getOwnPropertyNames(object);
-
-    // Freeze properties before freezing self
-
-    for (let name of propNames) {
+    for (let name of Object.getOwnPropertyNames(object)) {
         let value = object[name];
-
         if (value && typeof value === "object") {
             deepFreeze(value);
         }
     }
-
     return Object.freeze(object);
 }
 
 export class GravityContactSampler {
+
     constructor(population, maxDistance = 0.25, exponent = -2) {
-
-
         let tree = new kdTree(
             Array.from(population.asArray), //The kd tree will sort this list so let's pass a copy.
             (i1, i2) => Math.sqrt((i1.x - i2.x) ** 2 + (i1.y - i2.y) ** 2), //Euclidean
