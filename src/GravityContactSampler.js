@@ -1,5 +1,3 @@
-import {Population} from "./Population";
-
 export class GravityContactSampler {
     constructor(population, maxDistance = 0.25, exponent = -2) {
 
