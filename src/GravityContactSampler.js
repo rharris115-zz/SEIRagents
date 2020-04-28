@@ -1,7 +1,24 @@
+function deepFreeze(object) {
+
+    // Retrieve the property names defined on object
+    var propNames = Object.getOwnPropertyNames(object);
+
+    // Freeze properties before freezing self
+
+    for (let name of propNames) {
+        let value = object[name];
+
+        if (value && typeof value === "object") {
+            deepFreeze(value);
+        }
+    }
+
+    return Object.freeze(object);
+}
+
 export class GravityContactSampler {
     constructor(population, maxDistance = 0.25, exponent = -2) {
 
-        this.population = population
 
         let tree = new kdTree(
             Array.from(population.asArray), //The kd tree will sort this list so let's pass a copy.
@@ -29,22 +46,28 @@ export class GravityContactSampler {
         let neighborGravities = contact_gravity
             .map(neighbors => Array.from(neighbors, neighbor => neighbor.gravity))
 
-        this.neighborIdsById = population.asArray
+        let neighborIdsById = population.asArray
             .map((individual, index) => ({id: individual.id, neighborIds: neighborIds[index]}))
             .reduce((a, b) => ({...a, [b.id]: b.neighborIds}), {})
 
-        this.neighborGravitiesById = population.asArray
+
+        let neighborGravitiesById = population.asArray
             .map((individual, index) => ({id: individual.id, neighborGravities: neighborGravities[index]}))
             .reduce((a, b) => ({...a, [b.id]: b.neighborGravities}), {})
 
-        //Sum up the total gravity for each individual. This will determine probability of initial sampling.
-        this.individual_total_gravity = neighborGravities
+        //Sum up the total gravity for each individual. This will determine their probability of initial sampling.
+        let individual_total_gravity = neighborGravities
             .map(neighborGravity => neighborGravity.reduce((a, b) => a + b, 0))
 
         this.chance = new Chance()
+        this.population = population
 
-        Object.freeze(this)
+        this.neighborIdsById = deepFreeze(neighborIdsById)
+        this.neighborGravitiesById = deepFreeze(neighborGravitiesById)
+        this.individual_total_gravity = deepFreeze(individual_total_gravity)
+        Object.freeze(this) //We only want to shallow freeze this instance.
     }
+
 
     static builder(population) {
         class Builder {
