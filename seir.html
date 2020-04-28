@@ -16,19 +16,18 @@
     import {Population, unit_square_distribution, State} from "./src/Population.js"
     import {GravityContactSampler} from "./src/GravityContactSampler.js";
 
-    let scheduler = jssim.Scheduler()
-
     let n = 1000
     let exponent = -2
     let maxDistance = 0.25
 
     let pop = Population.of(n, index => "Agent_" + index.toString()).with(unit_square_distribution)
 
-
     let gravity = GravityContactSampler.builder(pop)
         .withMaxDistance(maxDistance)
         .withExponent(exponent)
         .build()
+
+    let scheduler = jssim.Scheduler()
 
     for (let i = 0; i < 100; i++) {
         let ind = gravity.sampleIndividual()

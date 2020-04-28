@@ -31,17 +31,21 @@ export class GravityContactSampler {
                 })
         })
 
+        // In the same order as population.asArray.
         let neighborIds = contact_gravity
             .map(neighbors => Array.from(neighbors, neighbor => neighbor.id))
 
+        // In the same order as population.asArray.
         let neighborGravities = contact_gravity
             .map(neighbors => Array.from(neighbors, neighbor => neighbor.gravity))
 
+        // An object with individual.id as attributes.
         let neighborIdsById = population.asArray
             .map((individual, index) => ({id: individual.id, neighborIds: neighborIds[index]}))
             .reduce((a, b) => ({...a, [b.id]: b.neighborIds}), {})
 
 
+        // An object with individual.id as attributes.
         let neighborGravitiesById = population.asArray
             .map((individual, index) => ({id: individual.id, neighborGravities: neighborGravities[index]}))
             .reduce((a, b) => ({...a, [b.id]: b.neighborGravities}), {})
@@ -56,7 +60,7 @@ export class GravityContactSampler {
         this.neighborIdsById = deepFreeze(neighborIdsById)
         this.neighborGravitiesById = deepFreeze(neighborGravitiesById)
         this.individual_total_gravity = deepFreeze(individual_total_gravity)
-        Object.freeze(this) //We only want to shallow freeze this instance.
+        Object.freeze(this) //We only want to shallow freeze this instance. We don't want to freeze this.population.
     }
 
 
