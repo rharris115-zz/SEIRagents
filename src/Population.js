@@ -25,19 +25,26 @@ export class Population {
                 }
             }
         })
+
+        this.chance = Chance()
+
         Object.freeze(this) //Shallow freeze ... individuals are still mutable.
     }
 
     static of(count, idfn = index => index) {
         return new Population(Array.from({length: count},
             (individual, index) => ({state: State.Susceptible, id: idfn(index)})
-        ));
+        ))
     }
 
     with(fn) {
         this.asArray.forEach((individual, index) => {
             Object.assign(individual, fn(individual, index)) //Individuals are mutable. References to them are not.
         })
-        return this;
+        return this
+    }
+
+    sample(n) {
+        return this.chance.pickset(this.asArray, n)
     }
 }

@@ -9,16 +9,17 @@
 </head>
 <body>
 
-<canvas id="myCanvas" width="400" height="400" style="border:1px solid #000000;"></canvas>
+<canvas id="seirCanvas" width="400" height="400" style="border:1px solid #000000;"></canvas>
 
 <script type="module">
 
     import {Population, unit_square_distribution, State} from "./src/Population.js"
-    import {GravityContactSampler} from "./src/GravityContactSampler.js";
+    import {GravityContactSampler} from "./src/GravityContactSampler.js"
 
     let n = 1000
     let exponent = -2
     let maxDistance = 0.25
+    let outbreakSize = 100
 
     let pop = Population.of(n, index => "Agent_" + index.toString()).with(unit_square_distribution)
 
@@ -27,16 +28,36 @@
         .withExponent(exponent)
         .build()
 
+    pop.sample(outbreakSize).forEach(individual => {
+        individual.state = State.Exposed
+    })
+
+    drawPopulation(pop, 4, {
+        [State.Susceptible]: '#2ca02c',
+        [State.Exposed]: '#bcbd22',
+        [State.Infected]: '#ff7f0e',
+        [State.Removed]: '#7f7f7f'
+    })
+
     let scheduler = jssim.Scheduler()
 
     for (let i = 0; i < 100; i++) {
         let ind = gravity.sampleIndividual()
         let neighbor = gravity.sampleNeighbor(ind.id)
-        ind.state = State.Infected
-        neighbor.state = State.Exposed
         console.log(ind, neighbor)
     }
 
+
+    function drawPopulation(pop, size, stateColors) {
+        let canvas = document.getElementById("seirCanvas")
+        let ctx = canvas.getContext("2d")
+        pop.asArray.forEach(individual => {
+            ctx.fillStyle = stateColors[individual.state]
+            let cx = individual.x * canvas.width
+            let cy = individual.y * canvas.height
+            ctx.fillRect(cx - size / 2, cy - size / 2, size, size)
+        })
+    }
 
 </script>
 

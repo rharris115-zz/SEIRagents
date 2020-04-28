@@ -1,8 +1,8 @@
 function deepFreeze(object) {
     for (let name of Object.getOwnPropertyNames(object)) {
-        let value = object[name];
+        let value = object[name]
         if (value && typeof value === "object") {
-            deepFreeze(value);
+            deepFreeze(value)
         }
     }
     return Object.freeze(object);
