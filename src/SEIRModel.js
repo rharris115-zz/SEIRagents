@@ -46,46 +46,50 @@ export class SEIRModel {
         return new Builder(gravityContactSampler);
     }
 
-    static diseaseLifeCycle(eventQueue, e, exposedTime, infectedTime) {
+    static expose(eventQueue, agent, exposedTime, infectedTime) {
+        agent.state = State.EXPOSED
+
         // Sample the durations for each of subsequent state.
         let timeExposed = exposedTime()
         let timeInfected = infectedTime()
 
         //Schedule when the exposed becomes infected.
         eventQueue.schedule(() => {
-            e.state = State.INFECTED
+            agent.state = State.INFECTED
         }, timeExposed)
 
         //Schedule when the infected is removed.
         eventQueue.schedule(() => {
-            e.state = State.REMOVED
+            agent.state = State.REMOVED
         }, timeExposed + timeInfected)
     }
 
     setupEvents() {
         let eventQueue = this.eventQueue
+
         let contactsTime = this.contactsTime
         let exposedTime = this.exposedTime
         let infectedTime = this.infectedTime
+
         let gravityContactSampler = this.gravityContactSampler
 
-        for (let e of gravityContactSampler.population.asArray.filter(State.EXPOSED.asFilter())) {
-            SEIRModel.diseaseLifeCycle(eventQueue, e, exposedTime, infectedTime)
-        }
+        let exposedFilter = State.EXPOSED.asFilter()
+        let infectedFilter = State.INFECTED.asFilter()
+        let susceptibleFilter = State.SUSCEPTIBLE.asFilter()
 
+        // Check for already exposed agents and setup their disease events.
+        for (let e of gravityContactSampler.population.asArray.filter(exposedFilter)) {
+            SEIRModel.expose(eventQueue, e, exposedTime, infectedTime)
+        }
+        
         function contact() {
             let agent = gravityContactSampler.sampleAgent()
             let neighbor = gravityContactSampler.sampleNeighbor(agent.id)
 
-            let infected = [agent, neighbor].filter(State.INFECTED.asFilter())
-            let susceptible = [agent, neighbor].filter(State.SUSCEPTIBLE.asFilter())
-
-            // If anyone is infected, the susceptible will now be exposed.
-            if (infected.length) {
-                for (let s of susceptible) {
-                    s.state = State.EXPOSED
-                    SEIRModel.diseaseLifeCycle(eventQueue, s, exposedTime, infectedTime)
-                }
+            if (infectedFilter(agent) && susceptibleFilter(neighbor)) {
+                SEIRModel.expose(eventQueue, neighbor, exposedTime, infectedTime)
+            } else if (infectedFilter(neighbor) && susceptibleFilter(agent)) {
+                SEIRModel.expose(eventQueue, agent, exposedTime, infectedTime)
             }
 
             //Schedule the next contact event.
