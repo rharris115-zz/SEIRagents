@@ -81,7 +81,7 @@ export class SEIRModel {
         for (let e of gravityContactSampler.population.asArray.filter(exposedFilter)) {
             SEIRModel.expose(eventQueue, e, exposedTime, infectedTime)
         }
-        
+
         function contact() {
             let agent = gravityContactSampler.sampleAgent()
             let neighbor = gravityContactSampler.sampleNeighbor(agent.id)
