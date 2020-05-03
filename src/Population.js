@@ -8,13 +8,13 @@ export class Population {
 
     constructor(individuals) {
         this.asArray = Object.freeze(Array.from(individuals)) //Shallow freeze ... individuals are still mutable.
-        for (let individual of this.asArray) {
-            if (individual.hasOwnProperty('id')) {
-                let id = individual.id
+        for (let agent of this.asArray) {
+            if (agent.hasOwnProperty('id')) {
+                let id = agent.id
                 if (id === "asArray") {
                     throw "\"asArray\" is a reserved attribute and cannot be used as an individual id."
                 } else {
-                    this[id] = individual
+                    this[id] = agent
                 }
             }
         }
@@ -26,13 +26,13 @@ export class Population {
 
     static of(count, idfn = index => index) {
         return new Population(Array.from({length: count},
-            (individual, index) => ({state: State.Susceptible, id: idfn(index)})
+            (agent, index) => ({state: State.Susceptible, id: idfn(index)})
         ))
     }
 
     assignAttributes(fn) {
-        for (let individual of this.asArray) {
-            Object.assign(individual, fn(individual)) //Individuals are mutable. References to them are not.
+        for (let agent of this.asArray) {
+            Object.assign(agent, fn(agent)) //Individuals are mutable. References to them are not.
         }
         return this
     }
