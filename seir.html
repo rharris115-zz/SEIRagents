@@ -44,8 +44,8 @@
 
     let model = SEIRModel.builder(gravity)
         .withContactsTime(Prob.exponential(n * contact_rate_per_individual))
-        .withExposedTime(Prob.lognormal(2, 0.5)) // mean: 8.372897488127265 stdev: 4.462254918069333
-        .withInfectedTime(Prob.lognormal(2, 0.5)) // mean: 8.372897488127265 stdev: 4.462254918069333
+        .withExposedTime(Prob.lognormal(2, 0.5)) // mean: 8.37 stdev: 4.46
+        .withInfectedTime(Prob.lognormal(2, 0.5)) // mean: 8.37 stdev: 4.46
         .build()
 
     model.setupEvents()
