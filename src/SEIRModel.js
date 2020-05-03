@@ -69,9 +69,9 @@ export class SEIRModel {
         let infectedTime = this.infectedTime
         let gravityContactSampler = this.gravityContactSampler
 
-        gravityContactSampler.population.withState(State.Exposed).forEach((e) => {
+        for (let e of gravityContactSampler.population.withState(State.Exposed)) {
             SEIRModel.diseaseLifeCycle(eventQueue, e, exposedTime, infectedTime)
-        })
+        }
 
         function contact() {
             let individual = gravityContactSampler.sampleIndividual()
@@ -80,12 +80,12 @@ export class SEIRModel {
             let infected = [individual, neighbor].filter((agent) => (agent.state === State.Infected))
             let susceptible = [individual, neighbor].filter((agent) => (agent.state === State.Susceptible))
 
-            // If anyone is infected, anyone susceptible will now be exposed.
+            // If anyone is infected, the susceptible will now be exposed.
             if (infected.length) {
-                susceptible.forEach((s) => {
+                for (let s of susceptible) {
                     s['state'] = State.Exposed
                     SEIRModel.diseaseLifeCycle(eventQueue, s, exposedTime, infectedTime)
-                })
+                }
             }
 
             //Schedule the next contact event.

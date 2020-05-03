@@ -8,7 +8,7 @@ export class Population {
 
     constructor(individuals) {
         this.asArray = Object.freeze(Array.from(individuals)) //Shallow freeze ... individuals are still mutable.
-        this.asArray.forEach((individual) => {
+        for (let individual of this.asArray) {
             if (individual.hasOwnProperty('id')) {
                 let id = individual.id
                 if (id === "asArray") {
@@ -17,7 +17,7 @@ export class Population {
                     this[id] = individual
                 }
             }
-        })
+        }
 
         this.chance = Chance()
 
@@ -31,9 +31,9 @@ export class Population {
     }
 
     assignAttributes(fn) {
-        this.asArray.forEach((individual, index) => {
-            Object.assign(individual, fn(individual, index)) //Individuals are mutable. References to them are not.
-        })
+        for (let individual of this.asArray) {
+            Object.assign(individual, fn(individual)) //Individuals are mutable. References to them are not.
+        }
         return this
     }
 

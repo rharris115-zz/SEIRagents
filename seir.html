@@ -12,6 +12,11 @@
 <body>
 
 <canvas id="seirCanvas" width="400" height="400" style="border:1px solid #000000;"></canvas>
+<pre id="dayDisplay"></pre>
+<pre id="sDisplay"></pre>
+<pre id="eDisplay"></pre>
+<pre id="iDisplay"></pre>
+<pre id="rDisplay"></pre>
 
 <script type="module">
 
@@ -24,7 +29,6 @@
     let exponent = -2
     let maxDistance = 0.25
     let outbreakSize = 1
-
     let contact_rate_per_individual = 1.0
 
 
@@ -43,41 +47,48 @@
         .withInfectedTime(Prob.lognormal(2, 0.5)) // mean: 8.372897488127265 stdev: 4.462254918069333
         .build()
 
-    pop.sample(outbreakSize).forEach(individual => {
+    for (let individual of pop.sample(outbreakSize)) {
         individual.state = State.Exposed
-    })
+    }
     model.setupEvents()
 
     var timer = setInterval(runDay, 1000)
 
-    let day = 1
-
+    let day = 0
 
     function runDay() {
-        model.eventQueue.runUntil(day++)
+        model.eventQueue.runUntil(++day)
 
-        let sCount = pop.withState(State.Susceptible).length
-        let eCount = pop.withState(State.Exposed).length
-        let iCount = pop.withState(State.Infected).length
-        let rCount = pop.withState(State.Removed).length
+        let susceptible = pop.withState(State.Susceptible)
+        let exposed = pop.withState(State.Exposed)
+        let infected = pop.withState(State.Infected)
+        let removed = pop.withState(State.Removed)
 
-        drawPopulation(pop, 2, {
-            [State.Susceptible]: '#2ca02c',
-            [State.Exposed]: '#bcbd22',
-            [State.Infected]: '#ff7f0e',
-            [State.Removed]: '#7f7f7f'
-        })
+        document.getElementById('dayDisplay').innerHTML = 'Day: ' + day
+        document.getElementById('sDisplay').innerHTML = 'Susceptible: ' + susceptible.length
+        document.getElementById('eDisplay').innerHTML = 'Exposed: ' + exposed.length
+        document.getElementById('iDisplay').innerHTML = 'Infected: ' + infected.length
+        document.getElementById('rDisplay').innerHTML = 'Removed: ' + removed.length
+
+        drawPopulation({
+            '#2ca02c': susceptible,
+            '#bcbd22': exposed,
+            '#ff7f0e': infected,
+            '#7f7f7f': removed
+        }, 2)
     }
 
-    function drawPopulation(pop, size, stateColors) {
+    function drawPopulation(subPopulationByColor, size) {
         let canvas = document.getElementById("seirCanvas")
         let ctx = canvas.getContext("2d")
-        pop.asArray.forEach(individual => {
-            ctx.fillStyle = stateColors[individual.state]
-            let cx = individual.x * canvas.width
-            let cy = individual.y * canvas.height
-            ctx.fillRect(cx - size / 2, cy - size / 2, size, size)
-        })
+        for (let [color, subPopulation] of Object.entries(subPopulationByColor)) {
+            ctx.fillStyle = color
+            for (let individual of subPopulation) {
+                let cx = individual.x * canvas.width
+                let cy = individual.y * canvas.height
+                ctx.fillRect(cx - size / 2, cy - size / 2, size, size)
+            }
+        }
     }
 
 </script>
