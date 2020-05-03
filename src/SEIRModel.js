@@ -53,12 +53,12 @@ export class SEIRModel {
 
         //Schedule when the exposed becomes infected.
         eventQueue.schedule(() => {
-            e.state = State.Infected
+            e.state = State.INFECTED
         }, timeExposed)
 
         //Schedule when the infected is removed.
         eventQueue.schedule(() => {
-            e.state = State.Removed
+            e.state = State.REMOVED
         }, timeExposed + timeInfected)
     }
 
@@ -69,7 +69,7 @@ export class SEIRModel {
         let infectedTime = this.infectedTime
         let gravityContactSampler = this.gravityContactSampler
 
-        for (let e of gravityContactSampler.population.asArray.filter(State.Exposed.asFilter())) {
+        for (let e of gravityContactSampler.population.asArray.filter(State.EXPOSED.asFilter())) {
             SEIRModel.diseaseLifeCycle(eventQueue, e, exposedTime, infectedTime)
         }
 
@@ -77,13 +77,13 @@ export class SEIRModel {
             let agent = gravityContactSampler.sampleAgent()
             let neighbor = gravityContactSampler.sampleNeighbor(agent.id)
 
-            let infected = [agent, neighbor].filter(State.Infected.asFilter())
-            let susceptible = [agent, neighbor].filter(State.Susceptible.asFilter())
+            let infected = [agent, neighbor].filter(State.INFECTED.asFilter())
+            let susceptible = [agent, neighbor].filter(State.SUSCEPTIBLE.asFilter())
 
             // If anyone is infected, the susceptible will now be exposed.
             if (infected.length) {
                 for (let s of susceptible) {
-                    s.state = State.Exposed
+                    s.state = State.EXPOSED
                     SEIRModel.diseaseLifeCycle(eventQueue, s, exposedTime, infectedTime)
                 }
             }

@@ -32,7 +32,7 @@
     let contact_rate_per_individual = 1.0
 
 
-    let pop = Population.of(n, State.Susceptible.asSupplier(), index => "Agent_" + index.toString())
+    let pop = Population.of(n, State.SUSCEPTIBLE.asSupplier(), index => "Agent_" + index.toString())
         .assignAttributes(unit_square_distribution)
 
     let gravity = GravityContactSampler.builder(pop)
@@ -48,7 +48,7 @@
         .build()
 
     for (let agent of pop.sample(outbreakSize)) {
-        agent.state = State.Exposed
+        agent.state = State.EXPOSED
     }
     model.setupEvents()
 
@@ -59,10 +59,10 @@
     function runDay() {
         model.eventQueue.runUntil(++day)
 
-        let susceptible = pop.asArray.filter(State.Susceptible.asFilter())
-        let exposed = pop.asArray.filter(State.Exposed.asFilter())
-        let infected = pop.asArray.filter(State.Infected.asFilter())
-        let removed = pop.asArray.filter(State.Removed.asFilter())
+        let susceptible = pop.asArray.filter(State.SUSCEPTIBLE.asFilter())
+        let exposed = pop.asArray.filter(State.EXPOSED.asFilter())
+        let infected = pop.asArray.filter(State.INFECTED.asFilter())
+        let removed = pop.asArray.filter(State.REMOVED.asFilter())
 
         document.getElementById('dayDisplay').innerHTML = 'Day: ' + day
         document.getElementById('sDisplay').innerHTML = 'Susceptible: ' + susceptible.length

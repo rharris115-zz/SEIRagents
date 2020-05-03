@@ -13,10 +13,10 @@ export class StateInstance {
 }
 
 export const State = Object.freeze({
-    Susceptible: Object.freeze(new StateInstance('s')),
-    Exposed: Object.freeze(new StateInstance('e')),
-    Infected: Object.freeze(new StateInstance('i')),
-    Removed: Object.freeze(new StateInstance('r'))
+    SUSCEPTIBLE: Object.freeze(new StateInstance('s')),
+    EXPOSED: Object.freeze(new StateInstance('e')),
+    INFECTED: Object.freeze(new StateInstance('i')),
+    REMOVED: Object.freeze(new StateInstance('r'))
 })
 
 
