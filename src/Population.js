@@ -24,9 +24,9 @@ export class Population {
         Object.freeze(this) //Shallow freeze ... individuals are still mutable.
     }
 
-    static of(count, statefn = State.SUSCEPTIBLE.asSupplier(), idfn = index => index) {
+    static of(count, idfn = index => index) {
         return new Population(Array.from({length: count},
-            (agent, index) => ({state: statefn(), id: idfn(index)})
+            (agent, index) => ({state: State.SUSCEPTIBLE, id: idfn(index)})
         ))
     }
 

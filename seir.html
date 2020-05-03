@@ -32,7 +32,7 @@
     let outbreakSize = 1
     let contact_rate_per_individual = 1.0
 
-    let pop = Population.of(n, State.SUSCEPTIBLE.asSupplier(), index => "Agent_" + index.toString())
+    let pop = Population.of(n, index => "Agent_" + index.toString())
         .assignAttributes(unit_square_distribution)
 
     State.EXPOSED.apply(pop.sample(outbreakSize))
