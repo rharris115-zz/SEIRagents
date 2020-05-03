@@ -19,8 +19,8 @@ export class GravityContactSampler {
 
         // This is a list of lists of objects containing neighbor ids and gravity. Its in the same
         // order as population.asArray.
-        let contact_gravity = population.asArray.map((individual) => {
-            return tree.nearest(individual, population.asArray.length, maxDistance)
+        let contact_gravity = population.asArray.map((agent) => {
+            return tree.nearest(agent, population.asArray.length, maxDistance)
                 .filter(link => { //Remove self links.
                     let [neighbor, distance] = link
                     return distance !== 0
@@ -41,7 +41,7 @@ export class GravityContactSampler {
 
         // An object with individual.id as attributes.
         let neighborIdsById = population.asArray
-            .map((individual, index) => ({id: individual.id, neighborIds: neighborIds[index]}))
+            .map((agent, index) => ({id: agent.id, neighborIds: neighborIds[index]}))
             .reduce((a, b) => ({...a, [b.id]: b.neighborIds}), {})
 
 
@@ -51,7 +51,7 @@ export class GravityContactSampler {
             .reduce((a, b) => ({...a, [b.id]: b.neighborGravities}), {})
 
         //Sum up the total gravity for each individual. This will determine their probability of initial sampling.
-        let individual_total_gravity = neighborGravities
+        let agent_total_gravity = neighborGravities
             .map(neighborGravity => neighborGravity.reduce((a, b) => a + b, 0))
 
         this.chance = new Chance()
@@ -59,7 +59,7 @@ export class GravityContactSampler {
 
         this.neighborIdsById = deepFreeze(neighborIdsById)
         this.neighborGravitiesById = deepFreeze(neighborGravitiesById)
-        this.individual_total_gravity = deepFreeze(individual_total_gravity)
+        this.individual_total_gravity = deepFreeze(agent_total_gravity)
         Object.freeze(this) //We only want to shallow freeze this instance. We don't want to freeze this.population.
     }
 
@@ -88,7 +88,7 @@ export class GravityContactSampler {
         return new Builder(population);
     }
 
-    sampleIndividual() {
+    sampleAgent() {
         return this.chance.weighted(this.population.asArray, this.individual_total_gravity)
     }
 

@@ -47,8 +47,8 @@
         .withInfectedTime(Prob.lognormal(2, 0.5)) // mean: 8.372897488127265 stdev: 4.462254918069333
         .build()
 
-    for (let individual of pop.sample(outbreakSize)) {
-        individual.state = State.Exposed
+    for (let agent of pop.sample(outbreakSize)) {
+        agent.state = State.Exposed
     }
     model.setupEvents()
 
@@ -83,9 +83,9 @@
         let ctx = canvas.getContext("2d")
         for (let [color, subPopulation] of Object.entries(subPopulationByColor)) {
             ctx.fillStyle = color
-            for (let individual of subPopulation) {
-                let cx = individual.x * canvas.width
-                let cy = individual.y * canvas.height
+            for (let agent of subPopulation) {
+                let cx = agent.x * canvas.width
+                let cy = agent.y * canvas.height
                 ctx.fillRect(cx - size / 2, cy - size / 2, size, size)
             }
         }
