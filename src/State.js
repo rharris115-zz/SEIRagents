@@ -24,13 +24,9 @@ export const State = {
 State.asArray = Object.freeze(Object.values(State))
 
 State.groupByCode = function (agents) {
-    let grouped = State.asArray
-        .reduce((a, b) => {
-            return {...a, [b.code]: []}
-        }, {})
+    let grouped = State.asArray.reduce((a, b) => ({...a, [b.code]: []}), {})
     for (let agent of agents) {
-        let code = agent.state.code
-        grouped[code].push(agent)
+        grouped[agent.state.code].push(agent)
     }
     return Object.freeze(grouped)
 }
