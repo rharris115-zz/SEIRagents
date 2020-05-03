@@ -47,13 +47,16 @@ export class SEIRModel {
     }
 
     static diseaseLifeCycle(eventQueue, e, exposedTime, infectedTime) {
+        // Sample the times for each of the subsequent state durations.
         let timeExposed = exposedTime()
         let timeInfected = infectedTime()
 
+        //Schedule when the exposed becomes infected.
         eventQueue.schedule(() => {
             e['state'] = State.Infected
         }, timeExposed)
 
+        //Schedule when the infected is removed.
         eventQueue.schedule(() => {
             e['state'] = State.Removed
         }, timeExposed + timeInfected)
@@ -77,6 +80,7 @@ export class SEIRModel {
             let infected = [individual, neighbor].filter((agent) => (agent.state === State.Infected))
             let susceptible = [individual, neighbor].filter((agent) => (agent.state === State.Susceptible))
 
+            // If anyone is infected, anyone susceptible will now be exposed.
             if (infected.length) {
                 susceptible.forEach((s) => {
                     s['state'] = State.Exposed
@@ -84,6 +88,7 @@ export class SEIRModel {
                 })
             }
 
+            //Schedule the next contact event.
             eventQueue.schedule(contact, contactsTime())
         }
 

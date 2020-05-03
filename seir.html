@@ -28,16 +28,13 @@
     let contact_rate_per_individual = 1.0
 
 
-    let pop = Population.of(n, index => "Agent_" + index.toString()).assignAttributes(unit_square_distribution)
+    let pop = Population.of(n, index => "Agent_" + index.toString())
+        .assignAttributes(unit_square_distribution)
 
     let gravity = GravityContactSampler.builder(pop)
         .withMaxDistance(maxDistance)
         .withExponent(exponent)
         .build()
-
-    pop.sample(outbreakSize).forEach(individual => {
-        individual.state = State.Exposed
-    })
 
 
     let model = SEIRModel.builder(gravity)
@@ -46,17 +43,25 @@
         .withInfectedTime(Prob.lognormal(2, 0.5)) // mean: 8.372897488127265 stdev: 4.462254918069333
         .build()
 
+    pop.sample(outbreakSize).forEach(individual => {
+        individual.state = State.Exposed
+    })
     model.setupEvents()
 
-    for (let day = 1; day < 200; day++) {
-        model.eventQueue.runUntil(day)
+    var timer = setInterval(runDay, 1000)
+
+    let day = 1
+
+
+    function runDay() {
+        model.eventQueue.runUntil(day++)
 
         let sCount = pop.withState(State.Susceptible).length
         let eCount = pop.withState(State.Exposed).length
         let iCount = pop.withState(State.Infected).length
         let rCount = pop.withState(State.Removed).length
 
-        drawPopulation(pop, 4, {
+        drawPopulation(pop, 2, {
             [State.Susceptible]: '#2ca02c',
             [State.Exposed]: '#bcbd22',
             [State.Infected]: '#ff7f0e',
