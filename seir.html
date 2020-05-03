@@ -8,16 +8,56 @@
     <script src="./node_modules/tinyqueue/tinyqueue.js"></script>
     <script src="./node_modules/kd-tree-javascript/kdTree.js"></script>
     <script src="./node_modules/chance/chance.js"></script>
+    <style>
+        canvas {
+            border: 1px solid;
+            solid-color: #000000;
+        }
+
+        table {
+            width: 400px;
+        }
+
+        th, td {
+            text-align: center;
+        }
+
+        #sCount {
+            color: #2ca02c;
+        }
+
+        #eCount {
+            color: #bcbd22;
+        }
+
+        #iCount {
+            color: #ff7f0e;
+        }
+
+        #rCount {
+            color: #7f7f7f;
+        }
+    </style>
 </head>
 <body>
 
-<canvas id="seirCanvas" width="400" height="400" style="border:1px solid #000000;"></canvas>
-
-<pre id="dayDisplay"></pre>
-<pre id="sDisplay"></pre>
-<pre id="eDisplay"></pre>
-<pre id="iDisplay"></pre>
-<pre id="rDisplay"></pre>
+<canvas id="seirCanvas" width="400" height="400"></canvas>
+<table>
+    <tr>
+        <th>Day</th>
+        <th>Susceptible</th>
+        <th>Exposed</th>
+        <th>Infected</th>
+        <th>Removed</th>
+    </tr>
+    <tr>
+        <td id="dayCount"></td>
+        <td id="sCount"></td>
+        <td id="eCount"></td>
+        <td id="iCount"></td>
+        <td id="rCount"></td>
+    </tr>
+</table>
 
 <script type="module">
 
@@ -57,16 +97,18 @@
     function runDay() {
         model.eventQueue.runUntil(++day)
 
-        let susceptible = pop.asArray.filter(State.SUSCEPTIBLE.asFilter())
-        let exposed = pop.asArray.filter(State.EXPOSED.asFilter())
-        let infected = pop.asArray.filter(State.INFECTED.asFilter())
-        let removed = pop.asArray.filter(State.REMOVED.asFilter())
+        let grouped = State.groupByCode(pop.asArray)
 
-        document.getElementById('dayDisplay').innerHTML = 'Day: ' + day
-        document.getElementById('sDisplay').innerHTML = 'Susceptible: ' + susceptible.length
-        document.getElementById('eDisplay').innerHTML = 'Exposed: ' + exposed.length
-        document.getElementById('iDisplay').innerHTML = 'Infected: ' + infected.length
-        document.getElementById('rDisplay').innerHTML = 'Removed: ' + removed.length
+        let susceptible = grouped[State.SUSCEPTIBLE.code]
+        let exposed = grouped[State.EXPOSED.code]
+        let infected = grouped[State.INFECTED.code]
+        let removed = grouped[State.REMOVED.code]
+
+        document.getElementById('dayCount').innerHTML = day
+        document.getElementById('sCount').innerHTML = susceptible.length
+        document.getElementById('eCount').innerHTML = exposed.length
+        document.getElementById('iCount').innerHTML = infected.length
+        document.getElementById('rCount').innerHTML = removed.length
 
         drawPopulation({
             '#2ca02c': susceptible,
