@@ -47,7 +47,7 @@ export class SEIRModel {
     }
 
     static diseaseLifeCycle(eventQueue, e, exposedTime, infectedTime) {
-        // Sample the times for each of the subsequent state durations.
+        // Sample the durations for each of subsequent state.
         let timeExposed = exposedTime()
         let timeInfected = infectedTime()
 
