@@ -53,12 +53,12 @@ export class SEIRModel {
 
         //Schedule when the exposed becomes infected.
         eventQueue.schedule(() => {
-            e['state'] = State.Infected
+            e.state = State.Infected
         }, timeExposed)
 
         //Schedule when the infected is removed.
         eventQueue.schedule(() => {
-            e['state'] = State.Removed
+            e.state = State.Removed
         }, timeExposed + timeInfected)
     }
 
@@ -83,7 +83,7 @@ export class SEIRModel {
             // If anyone is infected, the susceptible will now be exposed.
             if (infected.length) {
                 for (let s of susceptible) {
-                    s['state'] = State.Exposed
+                    s.state = State.Exposed
                     SEIRModel.diseaseLifeCycle(eventQueue, s, exposedTime, infectedTime)
                 }
             }
