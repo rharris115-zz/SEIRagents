@@ -4,7 +4,7 @@ import {State} from "./State.js"
 export class SEIRModel {
 
     constructor(gravityContactSampler,
-                contactsTime = 1,
+                contactsTime = () => (Math.random()),
                 exposedTime = () => (Math.random()),
                 infectedTime = () => (Math.random())) {
 
