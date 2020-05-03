@@ -46,12 +46,8 @@ export class SEIRModel {
         return new Builder(gravityContactSampler);
     }
 
-    static expose(eventQueue, agent, exposedTime, infectedTime) {
+    static expose(eventQueue, agent, timeExposed, timeInfected) {
         agent.state = State.EXPOSED
-
-        // Sample the durations for each of subsequent state.
-        let timeExposed = exposedTime()
-        let timeInfected = infectedTime()
 
         //Schedule when the exposed becomes infected.
         eventQueue.schedule(() => {
@@ -79,7 +75,7 @@ export class SEIRModel {
 
         // Check for already exposed agents and setup their disease events.
         for (let e of gravityContactSampler.population.asArray.filter(exposedFilter)) {
-            SEIRModel.expose(eventQueue, e, exposedTime, infectedTime)
+            SEIRModel.expose(eventQueue, e, exposedTime(), infectedTime())
         }
 
         function contact() {
@@ -87,9 +83,9 @@ export class SEIRModel {
             let neighbor = gravityContactSampler.sampleNeighbor(agent.id)
 
             if (infectedFilter(agent) && susceptibleFilter(neighbor)) {
-                SEIRModel.expose(eventQueue, neighbor, exposedTime, infectedTime)
+                SEIRModel.expose(eventQueue, neighbor, exposedTime(), infectedTime())
             } else if (infectedFilter(neighbor) && susceptibleFilter(agent)) {
-                SEIRModel.expose(eventQueue, agent, exposedTime, infectedTime)
+                SEIRModel.expose(eventQueue, agent, exposedTime(), infectedTime())
             }
 
             //Schedule the next contact event.
