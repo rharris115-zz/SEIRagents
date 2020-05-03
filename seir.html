@@ -96,6 +96,7 @@
 
     let canvas = document.getElementById("seirCanvas")
     let ctx = canvas.getContext("2d")
+    let size = 2
 
     function runDay() {
         model.eventQueue.runUntil(++day)
@@ -109,11 +110,7 @@
             let displayElement = document.getElementById(code + 'Count')
             displayElement.innerText = subPopulation.length
 
-            let style = getComputedStyle(displayElement)
-            let c = style.getPropertyValue('color')
-
-            let size = 2
-            ctx.fillStyle = c
+            ctx.fillStyle = getComputedStyle(displayElement).getPropertyValue('color')
             for (let agent of subPopulation) {
                 let cx = agent.x * canvas.width
                 let cy = agent.y * canvas.height
