@@ -94,35 +94,26 @@
 
     let day = 0
 
+    let canvas = document.getElementById("seirCanvas")
+    let ctx = canvas.getContext("2d")
+
     function runDay() {
         model.eventQueue.runUntil(++day)
 
+        document.getElementById('dayCount').innerText = day
+
         let grouped = State.groupByCode(pop.asArray)
 
-        let susceptible = grouped[State.SUSCEPTIBLE.code]
-        let exposed = grouped[State.EXPOSED.code]
-        let infected = grouped[State.INFECTED.code]
-        let removed = grouped[State.REMOVED.code]
+        for (let [code, subPopulation] of Object.entries(grouped)) {
 
-        document.getElementById('dayCount').innerHTML = day
-        document.getElementById('sCount').innerHTML = susceptible.length
-        document.getElementById('eCount').innerHTML = exposed.length
-        document.getElementById('iCount').innerHTML = infected.length
-        document.getElementById('rCount').innerHTML = removed.length
+            let displayElement = document.getElementById(code + 'Count')
+            displayElement.innerText = subPopulation.length
 
-        drawPopulation({
-            '#2ca02c': susceptible,
-            '#bcbd22': exposed,
-            '#ff7f0e': infected,
-            '#7f7f7f': removed
-        }, 2)
-    }
+            let style = getComputedStyle(displayElement)
+            let c = style.getPropertyValue('color')
 
-    function drawPopulation(subPopulationByColor, size) {
-        let canvas = document.getElementById("seirCanvas")
-        let ctx = canvas.getContext("2d")
-        for (let [color, subPopulation] of Object.entries(subPopulationByColor)) {
-            ctx.fillStyle = color
+            let size = 2
+            ctx.fillStyle = c
             for (let agent of subPopulation) {
                 let cx = agent.x * canvas.width
                 let cy = agent.y * canvas.height
@@ -130,7 +121,6 @@
             }
         }
     }
-
 </script>
 
 

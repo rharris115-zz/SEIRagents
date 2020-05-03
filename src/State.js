@@ -21,8 +21,10 @@ export const State = {
     REMOVED: Object.freeze(new StateInstance('r'))
 }
 
+State.asArray = Object.freeze(Object.values(State))
+
 State.groupByCode = function (agents) {
-    let grouped = Object.values(State)
+    let grouped = State.asArray
         .reduce((a, b) => {
             return {...a, [b.code]: []}
         }, {})
@@ -32,6 +34,5 @@ State.groupByCode = function (agents) {
     }
     return Object.freeze(grouped)
 }
-
 
 Object.freeze(State)
