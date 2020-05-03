@@ -3,13 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>SEIR</title>
-    <script src="./node_modules/random-js/lib/random.js" type="text/javascript"></script>
-    <script src="./node_modules/prob.js/prob.js"></script>
-    <script src="./node_modules/tinyqueue/tinyqueue.js"></script>
-    <script src="./node_modules/kd-tree-javascript/kdTree.js"></script>
-    <script src="./node_modules/chance/chance.js"></script>
+    <script src="./node_modules/random-js/lib/random.min.js"></script>
+    <script src="./node_modules/prob.js/dist/prob-min.js"></script>
+    <script src="./node_modules/tinyqueue/tinyqueue.min.js"></script>
+    <script src="./node_modules/kd-tree-javascript/kdTree-min.js"></script>
+    <script src="./node_modules/chance/dist/chance.min.js"></script>
     <style>
-        canvas {
+        :root {
+            --s-color: #2ca02c;
+            --e-color: #bcbd22;
+            --i-color: #ff7f0e;
+            --r-color: #7f7f7f;
+        }
+
+        #seirCanvas {
             border: 1px solid;
             solid-color: #000000;
         }
@@ -23,19 +30,19 @@
         }
 
         #sCount {
-            color: #2ca02c;
+            color: var(--s-color);
         }
 
         #eCount {
-            color: #bcbd22;
+            color: var(--e-color);
         }
 
         #iCount {
-            color: #ff7f0e;
+            color: var(--i-color);
         }
 
         #rCount {
-            color: #7f7f7f;
+            color: var(--r-color);
         }
     </style>
 </head>
