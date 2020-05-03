@@ -24,9 +24,9 @@ export class Population {
         Object.freeze(this) //Shallow freeze ... individuals are still mutable.
     }
 
-    static of(count, idfn = index => index) {
+    static of(count, statefn = State.Susceptible.asSupplier(), idfn = index => index) {
         return new Population(Array.from({length: count},
-            (agent, index) => ({state: State.Susceptible, id: idfn(index)})
+            (agent, index) => ({state: statefn(), id: idfn(index)})
         ))
     }
 
@@ -39,9 +39,5 @@ export class Population {
 
     sample(n) {
         return this.chance.pickset(this.asArray, n)
-    }
-
-    withState(state) {
-        return this.asArray.filter((agent) => (agent.state === state))
     }
 }
