@@ -90,13 +90,13 @@
 
     model.setupEvents()
 
-    var timer = setInterval(runDay, 1000)
-
-    let day = 0
 
     let canvas = document.getElementById("seirCanvas")
     let ctx = canvas.getContext("2d")
     let size = 2
+
+    var timer = setInterval(runDay, 250)
+    let day = 0
 
     function runDay() {
         model.eventQueue.runUntil(++day)
