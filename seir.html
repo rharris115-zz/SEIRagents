@@ -12,6 +12,7 @@
 <body>
 
 <canvas id="seirCanvas" width="400" height="400" style="border:1px solid #000000;"></canvas>
+
 <pre id="dayDisplay"></pre>
 <pre id="sDisplay"></pre>
 <pre id="eDisplay"></pre>
@@ -31,15 +32,15 @@
     let outbreakSize = 1
     let contact_rate_per_individual = 1.0
 
-
     let pop = Population.of(n, State.SUSCEPTIBLE.asSupplier(), index => "Agent_" + index.toString())
         .assignAttributes(unit_square_distribution)
+
+    State.EXPOSED.apply(pop.sample(outbreakSize))
 
     let gravity = GravityContactSampler.builder(pop)
         .withMaxDistance(maxDistance)
         .withExponent(exponent)
         .build()
-
 
     let model = SEIRModel.builder(gravity)
         .withContactsTime(Prob.exponential(n * contact_rate_per_individual))
@@ -47,9 +48,6 @@
         .withInfectedTime(Prob.lognormal(2, 0.5)) // mean: 8.372897488127265 stdev: 4.462254918069333
         .build()
 
-    for (let agent of pop.sample(outbreakSize)) {
-        agent.state = State.EXPOSED
-    }
     model.setupEvents()
 
     var timer = setInterval(runDay, 1000)
