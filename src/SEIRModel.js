@@ -96,6 +96,7 @@ export class SEIRModel {
             eventQueue.schedule(contact, contactsTime())
         }
 
+        //Schedule the first contact event. More will follow recursively.
         contact()
     }
 }
