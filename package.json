@@ -4,6 +4,7 @@
   "dependencies": {
     "chance": "^1.1.4",
     "kd-tree-javascript": "^1.0.3",
-    "js-simulator": "^1.0.17"
+    "prob.js": "^1.0.6",
+    "tinyqueue": "^2.0.3"
   }
 }

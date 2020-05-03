@@ -1,17 +1,10 @@
-export const State = Object.freeze({
-    Susceptible: 0,
-    Exposed: 1,
-    Infected: 2,
-    Symptomatic: 3,
-    Removed: 4
-})
+import {State} from "./State.js";
 
 
 export let unit_square_distribution = () => ({x: Math.random(), y: Math.random()})
 
 
 export class Population {
-
 
     constructor(individuals) {
         this.asArray = Object.freeze(Array.from(individuals)) //Shallow freeze ... individuals are still mutable.
@@ -37,7 +30,7 @@ export class Population {
         ))
     }
 
-    with(fn) {
+    assignAttributes(fn) {
         this.asArray.forEach((individual, index) => {
             Object.assign(individual, fn(individual, index)) //Individuals are mutable. References to them are not.
         })
@@ -46,5 +39,9 @@ export class Population {
 
     sample(n) {
         return this.chance.pickset(this.asArray, n)
+    }
+
+    withState(state) {
+        return this.asArray.filter((agent) => (agent.state === state))
     }
 }
