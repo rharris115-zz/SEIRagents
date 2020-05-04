@@ -23,8 +23,12 @@ export const State = {
 
 State.asArray = Object.freeze(Object.values(State))
 
+State.objectWithCodeAttributes = function (valueSupplier = () => []) {
+    return Object.freeze(State.asArray.reduce((a, b) => ({...a, [b.code]: valueSupplier()}), {}))
+}
+
 State.groupByCode = function (agents) {
-    let grouped = State.asArray.reduce((a, b) => ({...a, [b.code]: []}), {})
+    let grouped = State.objectWithCodeAttributes()
     for (let agent of agents) {
         grouped[agent.state.code].push(agent)
     }
