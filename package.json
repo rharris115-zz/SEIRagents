@@ -1,10 +1,11 @@
 {
-  "name": "SEIRagents",
+  "name": "seir_agents",
   "version": "1.0.0",
   "dependencies": {
     "chance": "^1.1.4",
     "kd-tree-javascript": "^1.0.3",
     "prob.js": "^1.0.6",
-    "tinyqueue": "^2.0.3"
+    "tinyqueue": "^2.0.3",
+    "chart.js": "^2.9.3"
   }
 }

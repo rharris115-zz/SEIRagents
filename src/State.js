@@ -1,6 +1,7 @@
 class StateInstance {
-    constructor(code) {
+    constructor(code, displayName) {
         this.code = code
+        this.displayName = displayName
     }
 
     asFilter() {
@@ -15,13 +16,17 @@ class StateInstance {
 }
 
 export const State = {
-    SUSCEPTIBLE: Object.freeze(new StateInstance('s')),
-    EXPOSED: Object.freeze(new StateInstance('e')),
-    INFECTED: Object.freeze(new StateInstance('i')),
-    REMOVED: Object.freeze(new StateInstance('r'))
+    SUSCEPTIBLE: Object.freeze(new StateInstance('s', 'Susceptible')),
+    EXPOSED: Object.freeze(new StateInstance('e', 'Exposed')),
+    INFECTED: Object.freeze(new StateInstance('i', 'Infected')),
+    REMOVED: Object.freeze(new StateInstance('r', 'Removed'))
 }
 
 State.asArray = Object.freeze(Object.values(State))
+
+State.asReversedArray = Array.from(State.asArray)
+State.asReversedArray.reverse()
+Object.freeze(State.asReversedArray)
 
 State.objectWithCodePropertyNames = function (valueFunction = () => []) {
     return Object.freeze(State.asArray.reduce((a, b) => ({...a, [b.code]: valueFunction(b)}), {}))

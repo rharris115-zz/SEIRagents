@@ -8,6 +8,7 @@
     <script src="./node_modules/tinyqueue/tinyqueue.min.js"></script>
     <script src="./node_modules/kd-tree-javascript/kdTree-min.js"></script>
     <script src="./node_modules/chance/dist/chance.min.js"></script>
+    <script src="./node_modules/chart.js/dist/Chart.min.js"></script>
     <style>
         :root {
             --s-color: #2ca02c;
@@ -16,7 +17,7 @@
             --r-color: #7f7f7f;
         }
 
-        #seirCanvas {
+        #seir {
             border: 1px solid;
             solid-color: #000000;
         }
@@ -44,29 +45,44 @@
         #rCount {
             color: var(--r-color);
         }
+
+        #left {
+            float: left;
+        }
+
+        #right {
+            float: left;
+        }
     </style>
 </head>
 <body>
 
-<canvas id="seirCanvas" width="400" height="400"></canvas>
-<table>
-    <tr>
-        <th>Day</th>
-        <th>Susceptible</th>
-        <th>Exposed</th>
-        <th>Infected</th>
-        <th>Removed</th>
-    </tr>
-    <tr>
-        <td id="dayCount"></td>
-        <td id="sCount"></td>
-        <td id="eCount"></td>
-        <td id="iCount"></td>
-        <td id="rCount"></td>
-    </tr>
-</table>
+<div id="left">
+    <canvas id="seir" width="400" height="400"></canvas>
+    <table>
+        <tr>
+            <th>Day</th>
+            <th>Susceptible</th>
+            <th>Exposed</th>
+            <th>Infected</th>
+            <th>Removed</th>
+        </tr>
+        <tr>
+            <td id="dayCount"></td>
+            <td id="sCount"></td>
+            <td id="eCount"></td>
+            <td id="iCount"></td>
+            <td id="rCount"></td>
+        </tr>
+    </table>
+</div>
+<div id="right">
+    <canvas id="chart" width="600" height="400"></canvas>
+</div>
+
 
 <script type="module">
+
 
     import {Population, unit_square_distribution} from "./src/Population.js"
     import {State} from "./src/State.js"
@@ -98,9 +114,78 @@
     model.setupEvents()
 
 
-    let canvas = document.getElementById("seirCanvas")
-    let ctx = canvas.getContext("2d")
+    let seirCanvas = document.getElementById('seir')
+    let seirCtx = seirCanvas.getContext('2d')
     let size = 2
+
+    let stateColors = State.objectWithCodePropertyNames(
+        (state) => (getComputedStyle(document.documentElement).getPropertyValue('--' + state.code + '-color')))
+
+    let days = []
+    let stateCounts = State.objectWithCodePropertyNames()
+
+    let chartCtx = document.getElementById('chart').getContext('2d')
+    let data = {
+        labels: days,
+        datasets: State.asReversedArray.map((state, index) => {
+            let dataset = {
+                label: state.displayName,
+                pointRadius: 0,
+                borderColor: stateColors[state.code],
+                borderWidth: 1,
+                backgroundColor: stateColors[state.code] + '40',
+                data: stateCounts[state.code]
+            }
+            if (index === 0) {
+                // The first dataset will need to fill to the origin.
+                // The rest will fill to the previous dataset by default.
+                dataset['fill'] = 'origin'
+            }
+            return dataset
+        })
+    }
+
+    let config = {
+        type: 'line',
+        data: data,
+        options: {
+            title: {
+                display: false,
+                text: 'SEIR by Day'
+            },
+            tooltips: {
+                mode: 'index',
+            },
+            hover: {
+                mode: 'index'
+            },
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Day'
+                    }
+                }],
+                yAxes: [{
+                    stacked: true,
+                    scaleLabel: {
+                        display: false,
+                        labelString: 'N'
+                    }
+                }]
+            },
+            legend: {
+                reverse: true
+            },
+            elements: {
+                line: {
+                    fill: '-1' // by default, fill lines to the previous dataset
+                }
+            }
+        }
+    }
+    let chart = new Chart(chartCtx, config);
 
     let timer = setInterval(runDay, 250)
     let day = 0
@@ -109,6 +194,7 @@
         model.eventQueue.runUntil(++day)
 
         document.getElementById('dayCount').innerText = day
+        days.push(day)
 
         let grouped = State.groupByCode(pop.asArray)
 
@@ -121,14 +207,17 @@
 
             let displayElement = document.getElementById(code + 'Count')
             displayElement.innerText = subPopulation.length
+            stateCounts[code].push(subPopulation.length)
 
-            ctx.fillStyle = getComputedStyle(displayElement).getPropertyValue('color')
+            seirCtx.fillStyle = stateColors[code]
             for (let agent of subPopulation) {
-                let cx = agent.x * canvas.width
-                let cy = agent.y * canvas.height
-                ctx.fillRect(cx - size / 2, cy - size / 2, size, size)
+                let cx = agent.x * seirCanvas.width
+                let cy = agent.y * seirCanvas.height
+                seirCtx.fillRect(cx - size / 2, cy - size / 2, size, size)
             }
         }
+
+        chart.update()
     }
 </script>
 
