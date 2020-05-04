@@ -102,7 +102,7 @@
     let ctx = canvas.getContext("2d")
     let size = 2
 
-    var timer = setInterval(runDay, 250)
+    let timer = setInterval(runDay, 250)
     let day = 0
 
     function runDay() {
@@ -111,6 +111,11 @@
         document.getElementById('dayCount').innerText = day
 
         let grouped = State.groupByCode(pop.asArray)
+
+        if (!grouped[State.EXPOSED.code].length && !grouped[State.INFECTED.code].length) {
+            //We're out of new infection possibilities.
+            clearInterval(timer)
+        }
 
         for (let [code, subPopulation] of Object.entries(grouped)) {
 

@@ -19,17 +19,11 @@ export class GravityContactSampler {
 
         // This is a list of lists of objects containing neighbor ids and gravity. Its in the same
         // order as population.asArray.
-        let contact_gravity = population.asArray.map((agent) => {
-            return tree.nearest(agent, population.asArray.length, maxDistance)
-                .filter(link => { //Remove self links.
-                    let [neighbor, distance] = link
-                    return distance !== 0
-                })
-                .map(link => {
-                    let [neighbor, distance] = link
-                    return {id: neighbor.id, gravity: distance ** exponent}
-                })
-        })
+        let contact_gravity = population.asArray.map(agent => (
+            tree.nearest(agent, population.asArray.length, maxDistance)
+                .filter(([neighbor, distance]) => ((neighbor !== agent) && distance !== 0))
+                .map(([neighbor, distance]) => ({id: neighbor.id, gravity: distance ** exponent}))
+        ))
 
         // In the same order as population.asArray.
         let neighborIds = contact_gravity
