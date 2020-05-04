@@ -4,9 +4,9 @@ import {State} from "./State.js"
 export class SEIRModel {
 
     constructor(gravityContactSampler,
-                contactsTime = () => (Math.random()),
-                exposedTime = () => (Math.random()),
-                infectedTime = () => (Math.random())) {
+                contactsTime = Math.random,
+                exposedTime = Math.random,
+                infectedTime = Math.random) {
 
         this.gravityContactSampler = gravityContactSampler
         this.contactsTime = contactsTime
