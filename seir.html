@@ -19,11 +19,19 @@
 
         #seir {
             border: 1px solid;
-            solid-color: #000000;
+            solid-color: black;
         }
 
-        table {
+        .left {
             width: 400px;
+            text-align: center;
+        }
+
+        #play-pause {
+            width: 80px;
+            height: 80px;
+            color: #ff7f0e;
+            display: inline-block;
         }
 
         th, td {
@@ -46,44 +54,50 @@
             color: var(--r-color);
         }
 
-        #left {
-            float: left;
+        .flex-container {
+            width: 80%;
+            min-height: 400px;
+            margin: 0 auto;
+            display: flex;
         }
 
-        #right {
-            float: left;
+        .flex-container .column {
+            padding: 10px;
+            flex: 1;
         }
     </style>
 </head>
 <body>
 
-<div id="left">
-    <canvas id="seir" width="400" height="400"></canvas>
-    <table>
-        <tr>
-            <th>Day</th>
-            <th>Susceptible</th>
-            <th>Exposed</th>
-            <th>Infected</th>
-            <th>Removed</th>
-        </tr>
-        <tr>
-            <td id="dayCount"></td>
-            <td id="sCount"></td>
-            <td id="eCount"></td>
-            <td id="iCount"></td>
-            <td id="rCount"></td>
-        </tr>
-    </table>
+<div class="flex-container">
+    <div class="column">
+        <canvas id="seir" width="400" height="400"></canvas>
+        <table class="left">
+            <tr>
+                <th>Day</th>
+                <th>Susceptible</th>
+                <th>Exposed</th>
+                <th>Infected</th>
+                <th>Removed</th>
+            </tr>
+            <tr>
+                <td id="dayCount"></td>
+                <td id="sCount"></td>
+                <td id="eCount"></td>
+                <td id="iCount"></td>
+                <td id="rCount"></td>
+            </tr>
+        </table>
+        <div class="left">
+            <img id="play-pause" src="./vcr/play_pause.svg" alt="play/pause">
+        </div>
+    </div>
+    <div class="column">
+        <canvas id="chart"></canvas>
+    </div>
 </div>
-<div id="right">
-    <canvas id="chart" width="600" height="400"></canvas>
-</div>
-
 
 <script type="module">
-
-
     import {Population, unit_square_distribution} from "./src/Population.js"
     import {State} from "./src/State.js"
     import {GravityContactSampler} from "./src/GravityContactSampler.js"
@@ -91,7 +105,7 @@
 
     let n = 1000
     let exponent = -2
-    let maxDistance = 0.25
+    let maxDistance = 1 / 3
     let outbreakSize = 1
     let contact_rate_per_individual = 1.0
 
@@ -116,7 +130,7 @@
 
     let seirCanvas = document.getElementById('seir')
     let seirCtx = seirCanvas.getContext('2d')
-    let size = 2
+    let size = 4
 
     let stateColors = State.objectWithCodePropertyNames(
         (state) => (getComputedStyle(document.documentElement).getPropertyValue('--' + state.code + '-color')))
@@ -124,31 +138,65 @@
     let days = []
     let stateCounts = State.objectWithCodePropertyNames()
 
-    let chartCtx = document.getElementById('chart').getContext('2d')
-    let data = {
-        labels: days,
-        datasets: State.asReversedArray.map((state, index) => {
-            let dataset = {
-                label: state.displayName,
-                pointRadius: 0,
-                borderColor: stateColors[state.code],
-                borderWidth: 1,
-                backgroundColor: stateColors[state.code] + '40',
-                data: stateCounts[state.code]
+    let chart = createChart(days, stateCounts);
+
+    let timer = setInterval(runDay, 250)
+
+    let day = 0
+
+    function runDay() {
+        model.eventQueue.runUntil(++day)
+
+        document.getElementById('dayCount').innerText = day
+        days.push(day)
+
+        let grouped = State.groupByCode(pop.asArray)
+
+        if (!grouped[State.EXPOSED.code].length && !grouped[State.INFECTED.code].length) {
+            //We're out of new infection possibilities.
+            clearInterval(timer)
+        }
+
+        for (let [code, subPopulation] of Object.entries(grouped)) {
+
+            let displayElement = document.getElementById(code + 'Count')
+            displayElement.innerText = subPopulation.length
+            stateCounts[code].push(subPopulation.length)
+
+            seirCtx.fillStyle = stateColors[code]
+            for (let agent of subPopulation) {
+                let cx = agent.x * seirCanvas.width
+                let cy = agent.y * seirCanvas.height
+                seirCtx.fillRect(cx - size / 2, cy - size / 2, size, size)
             }
-            if (index === 0) {
-                // The first dataset will need to fill to the origin.
-                // The rest will fill to the previous dataset by default.
-                dataset['fill'] = 'origin'
-            }
-            return dataset
-        })
+        }
+
+        chart.update()
     }
 
-    let config = {
-        type: 'line',
-        data: data,
-        options: {
+    function createChart(days, stateCounts) {
+        let data = {
+            labels: days,
+            datasets: State.asReversedArray.map((state, index) => {
+                let dataset = {
+                    label: state.displayName,
+                    pointRadius: 0,
+                    borderColor: stateColors[state.code],
+                    borderWidth: 1,
+                    backgroundColor: stateColors[state.code] + '40',
+                    data: stateCounts[state.code]
+                }
+                if (index === 0) {
+                    // The first dataset will need to fill to the origin.
+                    // The rest will fill to the previous dataset by default.
+                    dataset['fill'] = 'origin'
+                }
+                return dataset
+            })
+        }
+
+        let options = {
+            maintainAspectRatio: false,
             title: {
                 display: false,
                 text: 'SEIR by Day'
@@ -184,40 +232,12 @@
                 }
             }
         }
-    }
-    let chart = new Chart(chartCtx, config);
 
-    let timer = setInterval(runDay, 250)
-    let day = 0
-
-    function runDay() {
-        model.eventQueue.runUntil(++day)
-
-        document.getElementById('dayCount').innerText = day
-        days.push(day)
-
-        let grouped = State.groupByCode(pop.asArray)
-
-        if (!grouped[State.EXPOSED.code].length && !grouped[State.INFECTED.code].length) {
-            //We're out of new infection possibilities.
-            clearInterval(timer)
-        }
-
-        for (let [code, subPopulation] of Object.entries(grouped)) {
-
-            let displayElement = document.getElementById(code + 'Count')
-            displayElement.innerText = subPopulation.length
-            stateCounts[code].push(subPopulation.length)
-
-            seirCtx.fillStyle = stateColors[code]
-            for (let agent of subPopulation) {
-                let cx = agent.x * seirCanvas.width
-                let cy = agent.y * seirCanvas.height
-                seirCtx.fillRect(cx - size / 2, cy - size / 2, size, size)
-            }
-        }
-
-        chart.update()
+        return new Chart(document.getElementById('chart').getContext('2d'), {
+            type: 'line',
+            data: data,
+            options: options
+        })
     }
 </script>
 
