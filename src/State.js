@@ -24,10 +24,6 @@ export const State = {
 
 State.asArray = Object.freeze(Object.values(State))
 
-State.asReversedArray = Array.from(State.asArray)
-State.asReversedArray.reverse()
-Object.freeze(State.asReversedArray)
-
 State.objectWithCodePropertyNames = function (valueFunction = () => []) {
     return Object.freeze(State.asArray.reduce((a, b) => ({...a, [b.code]: valueFunction(b)}), {}))
 }

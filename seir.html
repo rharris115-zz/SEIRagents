@@ -191,23 +191,28 @@
     }
 
     function createChart(days, stateCounts) {
+
+        let datasets = State.asArray.map((state, index) => {
+            let dataset = {
+                label: state.displayName,
+                pointRadius: 0,
+                borderColor: stateColors[state.code],
+                borderWidth: 1,
+                backgroundColor: stateColors[state.code] + '40',
+                data: stateCounts[state.code]
+            }
+            if (index === State.asArray.length - 1) {
+                // The first dataset (after reversal) will need to fill to the origin.
+                dataset['fill'] = 'origin'
+            }
+            return dataset
+        })
+
+        datasets.reverse()
+
         let data = {
             labels: days,
-            datasets: State.asReversedArray.map((state, index) => {
-                let dataset = {
-                    label: state.displayName,
-                    pointRadius: 0,
-                    borderColor: stateColors[state.code],
-                    borderWidth: 1,
-                    backgroundColor: stateColors[state.code] + '40',
-                    data: stateCounts[state.code]
-                }
-                if (index === 0) {
-                    // The first dataset will need to fill to the origin.
-                    dataset['fill'] = 'origin'
-                }
-                return dataset
-            })
+            datasets: datasets
         }
 
         let options = {
