@@ -27,11 +27,26 @@
             text-align: center;
         }
 
-        #play-pause {
+        .play-pause-off {
             width: 80px;
             height: 80px;
-            color: #ff7f0e;
             display: inline-block;
+        }
+
+        .play-pause-on {
+            width: 80px;
+            height: 80px;
+            display: inline-block;
+            filter: drop-shadow(0px 0px 4px blue);
+        }
+
+
+        #play-pause {
+            margin: 5px;
+        }
+
+        input:focus {
+            outline: none;
         }
 
         th, td {
@@ -89,7 +104,7 @@
             </tr>
         </table>
         <div class="left">
-            <img id="play-pause" src="./vcr/play_pause.svg" alt="play/pause">
+            <input id="play-pause" class="play-pause-off" type="image" alt="play/pause" src="./vcr/play_pause.svg">
         </div>
     </div>
     <div class="column">
@@ -139,13 +154,13 @@
     let stateCounts = State.objectWithCodePropertyNames()
 
     let chart = createChart(days, stateCounts);
-
-    let timer = setInterval(runDay, 250)
-
     let day = 0
 
+    //Call this function once to initialise displays.
+    runDay()
+
     function runDay() {
-        model.eventQueue.runUntil(++day)
+        model.eventQueue.runUntil(day)
 
         document.getElementById('dayCount').innerText = day
         days.push(day)
@@ -154,7 +169,7 @@
 
         if (!grouped[State.EXPOSED.code].length && !grouped[State.INFECTED.code].length) {
             //We're out of new infection possibilities.
-            clearInterval(timer)
+            startOrStop()
         }
 
         for (let [code, subPopulation] of Object.entries(grouped)) {
@@ -170,8 +185,9 @@
                 seirCtx.fillRect(cx - size / 2, cy - size / 2, size, size)
             }
         }
-
         chart.update()
+
+        day++
     }
 
     function createChart(days, stateCounts) {
@@ -188,7 +204,6 @@
                 }
                 if (index === 0) {
                     // The first dataset will need to fill to the origin.
-                    // The rest will fill to the previous dataset by default.
                     dataset['fill'] = 'origin'
                 }
                 return dataset
@@ -239,6 +254,23 @@
             options: options
         })
     }
+
+    let timer
+    let playButton = document.getElementById('play-pause')
+
+    function startOrStop() {
+        if (timer) {
+            playButton.className = 'play-pause-off'
+            clearInterval(timer)
+            timer = null
+        } else {
+            playButton.className = 'play-pause-on'
+            timer = setInterval(runDay, 250)
+        }
+    }
+
+    playButton.onclick = startOrStop
+
 </script>
 
 
