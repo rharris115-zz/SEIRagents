@@ -2,6 +2,7 @@ class StateInstance {
     constructor(code, displayName) {
         this.code = code
         this.displayName = displayName
+        Object.freeze(this)
     }
 
     asFilter() {
@@ -16,10 +17,10 @@ class StateInstance {
 }
 
 export const State = {
-    SUSCEPTIBLE: Object.freeze(new StateInstance('s', 'Susceptible')),
-    EXPOSED: Object.freeze(new StateInstance('e', 'Exposed')),
-    INFECTED: Object.freeze(new StateInstance('i', 'Infected')),
-    REMOVED: Object.freeze(new StateInstance('r', 'Removed'))
+    SUSCEPTIBLE: new StateInstance('s', 'Susceptible'),
+    EXPOSED: new StateInstance('e', 'Exposed'),
+    INFECTED: new StateInstance('i', 'Infected'),
+    REMOVED: new StateInstance('r', 'Removed')
 }
 
 State.asArray = Object.freeze(Object.values(State))
