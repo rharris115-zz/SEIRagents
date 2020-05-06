@@ -127,13 +127,14 @@
 
     State.EXPOSED.apply(pop.sample(outbreakSize))
 
+    //Also config objects.
     let gravity = GravityContactSampler.builder(pop)
         .withMaxDistance(maxDistance)
         .withExponent(exponent)
         .build()
 
     let model = SEIRModel.builder(gravity)
-        .withContactsTime(Prob.exponential(n * contact_rate_per_individual))
+        .withContactsTime(Prob.exponential(n * contact_rate_per_individual / 2))
         .withExposedTime(Prob.lognormal(2, 0.5)) // mean: 8.37 stdev: 4.46
         .withInfectedTime(Prob.lognormal(2, 0.5)) // mean: 8.37 stdev: 4.46
         .build()

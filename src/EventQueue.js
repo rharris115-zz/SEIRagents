@@ -18,7 +18,6 @@ export class EventQueue {
         this.queue.push(new Event(eventTask, this.currentTime + elapsedTime))
     }
 
-
     runOne() {
         let event = this.queue.pop()
         this.currentTime = event.time;

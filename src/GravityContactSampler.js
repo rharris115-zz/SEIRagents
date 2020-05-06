@@ -49,11 +49,11 @@ export class GravityContactSampler {
             .map(neighborGravity => neighborGravity.reduce((a, b) => a + b, 0))
 
         this.chance = new Chance()
-        this.population = population
+        this.population = population //Do not freeze the population.
 
         this.neighborIdsById = deepFreeze(neighborIdsById)
         this.neighborGravitiesById = deepFreeze(neighborGravitiesById)
-        this.individual_total_gravity = deepFreeze(agent_total_gravity)
+        this.agent_total_gravity = deepFreeze(agent_total_gravity)
         Object.freeze(this) //We only want to shallow freeze this instance. We don't want to freeze this.population.
     }
 
@@ -83,7 +83,7 @@ export class GravityContactSampler {
     }
 
     sampleAgent() {
-        return this.chance.weighted(this.population.asArray, this.individual_total_gravity)
+        return this.chance.weighted(this.population.asArray, this.agent_total_gravity)
     }
 
     sampleNeighbor(id) {
